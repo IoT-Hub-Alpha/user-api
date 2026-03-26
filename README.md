@@ -1,26 +1,13 @@
 # user-api
 
 Standalone Django microservice for user CRUD and role management.
-The repo structure is aligned to the team `Service-Template`, while preserving Django internals that fit the monolith extraction context.
 
 Current defaults:
-- standalone project outside the monolith repo
-- runs on port `8013`
-- supports SQLite for isolated bootstrap and PostgreSQL via env
+- runs on port `8013'
 - role model matches the monolith:
   - `admin` -> `is_superuser=True`
   - `operator` -> `Operators` group
   - `viewer` -> `Viewers` group
-
-## Monolith Context
-
-This service keeps the monolith's user and role semantics:
-- Django built-in `User`
-- `Admin` stays a Django superuser
-- `Operators` and `Viewers` stay Django groups
-- API remains under `/api/v1/...`
-
-It is intended to become the extracted user domain service while preserving the product behavior users already know from the monolith.
 
 ## Endpoints
 
@@ -63,13 +50,9 @@ tests/          root integration/unit tests
 
 ## Gateway Handoff
 
-For the gateway team, the relevant integration data is:
-
 - service name: `user-api`
 - internal port: `8013`
 - health: `/health/`
 - readiness: `/ready/`
 - users base URL: `http://user-api:8013/api/v1/users`
 - roles base URL: `http://user-api:8013/api/v1/roles`
-
-If the gateway uses a service registry, it needs entries for `users` and `roles` that point to those base URLs.
