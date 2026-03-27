@@ -18,7 +18,7 @@ This service keeps the monolith's user and role semantics:
 - Django built-in `User`
 - `Admin` stays a Django superuser
 - `Operators` and `Viewers` stay Django groups
-- API remains under `/api/v1/...`
+- API remains under `/v1/...`
 
 It is intended to become the extracted user domain service while preserving the product behavior users already know from the monolith.
 
@@ -26,14 +26,14 @@ It is intended to become the extracted user domain service while preserving the 
 
 - `GET /health/`
 - `GET /ready/`
-- `GET /api/v1/users/`
-- `POST /api/v1/users/`
-- `GET /api/v1/users/{id}/`
-- `PUT /api/v1/users/{id}/`
-- `PATCH /api/v1/users/{id}/`
-- `DELETE /api/v1/users/{id}/`
-- `PUT /api/v1/users/{id}/role/`
-- `GET /api/v1/roles/`
+- `GET /v1/users/`
+- `POST /v1/users/`
+- `GET /v1/users/{id}/`
+- `PUT /v1/users/{id}/`
+- `PATCH /v1/users/{id}/`
+- `DELETE /v1/users/{id}/`
+- `PUT /v1/users/{id}/role/`
+- `GET /v1/roles/`
 
 ## Local run
 
@@ -69,7 +69,8 @@ For the gateway team, the relevant integration data is:
 - internal port: `8013`
 - health: `/health/`
 - readiness: `/ready/`
-- users base URL: `http://user-api:8013/api/v1/users`
-- roles base URL: `http://user-api:8013/api/v1/roles`
+- users base URL: `http://user-api:8013/v1/users`
+- roles base URL: `http://user-api:8013/v1/roles`
 
 If the gateway uses a service registry, it needs entries for `users` and `roles` that point to those base URLs.
+

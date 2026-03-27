@@ -20,7 +20,7 @@ from app.services.user_service import (
 @pytest.mark.django_db
 def test_parse_json_body_rejects_invalid_json():
     request = RequestFactory().post(
-        "/api/v1/users/",
+        "/v1/users/",
         data="{not-json}",
         content_type="application/json",
     )
@@ -150,3 +150,4 @@ def test_update_user_partial_keeps_existing_values():
     assert updated.first_name == "After"
     assert updated.last_name == "State"
     assert updated.check_password("partialpass123") is True
+

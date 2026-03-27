@@ -34,7 +34,7 @@ def test_ready_endpoint_returns_not_ready_on_database_error(client, monkeypatch)
 
 @pytest.mark.django_db
 def test_list_users_rejects_non_integer_pagination(client):
-    response = client.get("/api/v1/users/?page=abc&page_size=10")
+    response = client.get("/v1/users/?page=abc&page_size=10")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Pagination values must be integers."}
@@ -42,7 +42,7 @@ def test_list_users_rejects_non_integer_pagination(client):
 
 @pytest.mark.django_db
 def test_get_user_returns_not_found(client):
-    response = client.get("/api/v1/users/99999/")
+    response = client.get("/v1/users/99999/")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "User not found."}
@@ -50,7 +50,7 @@ def test_get_user_returns_not_found(client):
 
 @pytest.mark.django_db
 def test_delete_user_returns_not_found(client):
-    response = client.delete("/api/v1/users/99999/")
+    response = client.delete("/v1/users/99999/")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "User not found."}
@@ -59,10 +59,11 @@ def test_delete_user_returns_not_found(client):
 @pytest.mark.django_db
 def test_assign_role_rejects_invalid_role(client, seeded_user):
     response = client.put(
-        f"/api/v1/users/{seeded_user.id}/role/",
+        f"/v1/users/{seeded_user.id}/role/",
         data='{"role": "boss"}',
         content_type="application/json",
     )
 
     assert response.status_code == 400
     assert "Invalid role" in response.json()["detail"]["role"]
+

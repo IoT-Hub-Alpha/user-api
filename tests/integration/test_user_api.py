@@ -15,7 +15,7 @@ def test_health_endpoint(client):
 @pytest.mark.django_db
 def test_create_user(client):
     response = client.post(
-        "/api/v1/users/",
+        "/v1/users/",
         data=json.dumps(
             {
                 "username": "operator-user",
@@ -36,7 +36,7 @@ def test_create_user(client):
 
 @pytest.mark.django_db
 def test_list_users(client, seeded_user):
-    response = client.get("/api/v1/users/?page=1&page_size=10")
+    response = client.get("/v1/users/?page=1&page_size=10")
 
     assert response.status_code == 200
     assert response.json()["pagination"]["total"] >= 1
@@ -45,7 +45,7 @@ def test_list_users(client, seeded_user):
 @pytest.mark.django_db
 def test_patch_user_role(client, seeded_user):
     response = client.put(
-        f"/api/v1/users/{seeded_user.id}/role/",
+        f"/v1/users/{seeded_user.id}/role/",
         data=json.dumps({"role": "viewer"}),
         content_type="application/json",
     )
@@ -56,7 +56,7 @@ def test_patch_user_role(client, seeded_user):
 
 @pytest.mark.django_db
 def test_delete_user(client, seeded_user):
-    response = client.delete(f"/api/v1/users/{seeded_user.id}/")
+    response = client.delete(f"/v1/users/{seeded_user.id}/")
 
     assert response.status_code == 204
     assert User.objects.filter(pk=seeded_user.id).exists() is False
@@ -64,7 +64,7 @@ def test_delete_user(client, seeded_user):
 
 @pytest.mark.django_db
 def test_roles_endpoint(client):
-    response = client.get("/api/v1/roles/")
+    response = client.get("/v1/roles/")
 
     assert response.status_code == 200
     payload = response.json()["data"]
@@ -74,7 +74,7 @@ def test_roles_endpoint(client):
 @pytest.mark.django_db
 def test_create_user_rejects_duplicate_username(client, seeded_user):
     response = client.post(
-        "/api/v1/users/",
+        "/v1/users/",
         data=json.dumps(
             {
                 "username": seeded_user.username,
@@ -87,3 +87,4 @@ def test_create_user_rejects_duplicate_username(client, seeded_user):
     )
 
     assert response.status_code == 409
+
