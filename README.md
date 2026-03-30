@@ -47,12 +47,3 @@ app/core        service config and health views
 config/         Django settings and URL config
 tests/          root integration/unit tests
 ```
-
-## Gateway Handoff
-
-- service name: `user-api`
-- internal port: `8013`
-- health: `/health/`
-- readiness: `/ready/`
-- users base URL: `http://user-api:8013/api/v1/users`
-- roles base URL: `http://user-api:8013/api/v1/roles`

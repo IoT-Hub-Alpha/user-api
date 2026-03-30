@@ -72,6 +72,32 @@ def test_roles_endpoint(client):
 
 
 @pytest.mark.django_db
+def test_patch_user_rejects_blank_username(client, seeded_user):
+    response = client.patch(
+        f"/v1/users/{seeded_user.id}/",
+        data=json.dumps({"username": "   "}),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": {"username": "This field may not be blank."}
+    }
+
+
+@pytest.mark.django_db
+def test_patch_user_rejects_blank_email(client, seeded_user):
+    response = client.patch(
+        f"/v1/users/{seeded_user.id}/",
+        data=json.dumps({"email": "   "}),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": {"email": "This field may not be blank."}}
+
+
+@pytest.mark.django_db
 def test_create_user_rejects_duplicate_username(client, seeded_user):
     response = client.post(
         "/v1/users/",
@@ -87,4 +113,5 @@ def test_create_user_rejects_duplicate_username(client, seeded_user):
     )
 
     assert response.status_code == 409
+
 

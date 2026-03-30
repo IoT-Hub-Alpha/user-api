@@ -159,6 +159,14 @@ def normalize_payload(payload: dict, partial: bool = False) -> dict:
     if "role" in payload:
         cleaned["role"] = validate_role(payload["role"])
 
+    blank_field_errors = {}
+    for field in ("username", "email"):
+        if field in payload and cleaned[field] == "":
+            blank_field_errors[field] = "This field may not be blank."
+
+    if blank_field_errors:
+        raise ValidationError(blank_field_errors)
+
     return cleaned
 
 
@@ -218,3 +226,4 @@ def update_user(user: User, payload: dict, partial: bool) -> User:
     if cleaned["role"] is not None:
         assign_role(user, cleaned["role"])
     return user
+

@@ -95,6 +95,22 @@ def test_normalize_payload_requires_fields_for_non_partial():
 
 
 @pytest.mark.django_db
+def test_normalize_payload_rejects_blank_username_on_partial_update():
+    with pytest.raises(ValidationError) as exc_info:
+        normalize_payload({"username": "   "}, partial=True)
+
+    assert exc_info.value.detail == {"username": "This field may not be blank."}
+
+
+@pytest.mark.django_db
+def test_normalize_payload_rejects_blank_email_on_partial_update():
+    with pytest.raises(ValidationError) as exc_info:
+        normalize_payload({"email": "   "}, partial=True)
+
+    assert exc_info.value.detail == {"email": "This field may not be blank."}
+
+
+@pytest.mark.django_db
 def test_update_user_replaces_fields_and_password():
     user = User.objects.create_user(
         username="replace-me",
@@ -150,4 +166,5 @@ def test_update_user_partial_keeps_existing_values():
     assert updated.first_name == "After"
     assert updated.last_name == "State"
     assert updated.check_password("partialpass123") is True
+
 
