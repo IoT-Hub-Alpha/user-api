@@ -1,3 +1,4 @@
 Django==5.2.10
 psycopg2-binary==2.9.11
 iot-logging-schemas @ git+https://github.com/IoT-Hub-Alpha/logging-lib.git@dev
+iot-auth @ git+https://github.com/IoT-Hub-Alpha/jwt-auth-lib.git@04c2b07

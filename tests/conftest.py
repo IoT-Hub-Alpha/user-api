@@ -5,6 +5,11 @@ from django.test import Client
 
 @pytest.fixture
 def client():
+    return Client(HTTP_X_INTERNAL_SERVICE="test-suite")
+
+
+@pytest.fixture
+def raw_client():
     return Client()
 
 
