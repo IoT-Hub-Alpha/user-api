@@ -46,7 +46,7 @@ DB_NAME=iot_hub_platform
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=users_user
-DB_PASSWORD=users_change_me
+DB_PASSWORD=change-me-users-password
 DB_SCHEMA=users
 ```
 
@@ -61,7 +61,7 @@ Before the first migration run, make sure the service database role can either:
 Example admin SQL:
 
 ```sql
-CREATE ROLE users_user LOGIN PASSWORD 'users_change_me';
+CREATE ROLE users_user LOGIN PASSWORD 'change-me-users-password';
 GRANT CONNECT, CREATE ON DATABASE iot_hub_platform TO users_user;
 ```
 
@@ -88,6 +88,9 @@ This is the intended pattern for other services too:
 docker build -t user-api .
 docker run --rm -p 8013:8013 user-api
 ```
+
+`/ready/` returns `503` until the database is reachable and all migrations have
+been applied.
 
 ## Project Structure
 

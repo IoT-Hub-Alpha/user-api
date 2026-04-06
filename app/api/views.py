@@ -1,3 +1,5 @@
+import logging
+
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -11,9 +13,13 @@ from app.services.user_service import (
     list_roles,
     paginated_users,
     parse_json_body,
+    resolve_role,
     serialize_user,
     update_user,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def handle_api_error(exc: ApiError) -> JsonResponse:
@@ -64,7 +70,15 @@ class UserDetailView(View):
             user = get_user_or_404(user_id)
         except ApiError as exc:
             return handle_api_error(exc)
+        user_log_data = {
+            "operation": "delete_user",
+            "user_id": str(user.id),
+            "username": user.username,
+            "role": resolve_role(user),
+            "is_active": user.is_active,
+        }
         user.delete()
+        logger.info("User deleted", extra=user_log_data)
         return HttpResponse(status=204)
 
     def _update(
