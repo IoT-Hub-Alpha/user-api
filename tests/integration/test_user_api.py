@@ -80,9 +80,7 @@ def test_patch_user_rejects_blank_username(client, seeded_user):
     )
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": {"username": "This field may not be blank."}
-    }
+    assert response.json() == {"detail": {"username": "This field may not be blank."}}
 
 
 @pytest.mark.django_db
@@ -113,5 +111,3 @@ def test_create_user_rejects_duplicate_username(client, seeded_user):
     )
 
     assert response.status_code == 409
-
-

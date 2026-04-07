@@ -267,4 +267,3 @@ def update_user(user: User, payload: dict, partial: bool) -> User:
     )
 
     return user
-

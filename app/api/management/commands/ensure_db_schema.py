@@ -33,10 +33,12 @@ class Command(BaseCommand):
             with connection.cursor() as cursor:
                 cursor.execute(f"CREATE SCHEMA {quoted_schema}")
         except ProgrammingError as exc:
+            database_name = connection.settings_dict["NAME"]
+            database_user = connection.settings_dict["USER"]
             raise CommandError(
                 "Unable to create schema "
                 f'"{schema_name}". Grant CREATE on database '
-                f'"{connection.settings_dict["NAME"]}" to "{connection.settings_dict["USER"]}", '
+                f'"{database_name}" to "{database_user}", '
                 "or create the schema as an admin user first."
             ) from exc
 

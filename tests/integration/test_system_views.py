@@ -29,7 +29,9 @@ def test_ready_endpoint_returns_ready(client, monkeypatch):
         "app.core.views.connection.ensure_connection",
         ensure_connection,
     )
-    monkeypatch.setattr("app.core.views.has_pending_migrations", Mock(return_value=False))
+    monkeypatch.setattr(
+        "app.core.views.has_pending_migrations", Mock(return_value=False)
+    )
 
     response = client.get("/ready/")
 
@@ -59,7 +61,9 @@ def test_ready_endpoint_returns_not_ready_when_migrations_are_pending(
         "app.core.views.connection.ensure_connection",
         Mock(),
     )
-    monkeypatch.setattr("app.core.views.has_pending_migrations", Mock(return_value=True))
+    monkeypatch.setattr(
+        "app.core.views.has_pending_migrations", Mock(return_value=True)
+    )
 
     response = client.get("/ready/")
 
@@ -104,4 +108,3 @@ def test_assign_role_rejects_invalid_role(client, seeded_user):
 
     assert response.status_code == 400
     assert "Invalid role" in response.json()["detail"]["role"]
-
