@@ -166,5 +166,3 @@ def test_update_user_partial_keeps_existing_values():
     assert updated.first_name == "After"
     assert updated.last_name == "State"
     assert updated.check_password("partialpass123") is True
-
-

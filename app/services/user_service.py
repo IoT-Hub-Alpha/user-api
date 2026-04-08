@@ -1,3 +1,4 @@
+import logging
 import json
 
 from django.contrib.auth.models import Group, User
@@ -6,6 +7,9 @@ from django.db import transaction
 from django.http import HttpRequest
 
 from app.models.schemas import ROLE_MAP
+
+
+logger = logging.getLogger(__name__)
 
 
 class ApiError(Exception):
@@ -183,6 +187,18 @@ def assign_role(user: User, role_name: str) -> User:
     user.is_superuser = descriptor.is_superuser
     user.is_staff = True
     user.save(update_fields=["is_superuser", "is_staff"])
+
+    logger.info(
+        "User role assigned",
+        extra={
+            "operation": "assign_role",
+            "user_id": str(user.id),
+            "username": user.username,
+            "role": role_name,
+            "is_superuser": user.is_superuser,
+        },
+    )
+
     return user
 
 
@@ -200,7 +216,20 @@ def create_user(payload: dict) -> User:
         is_active=True if cleaned["is_active"] is None else cleaned["is_active"],
         is_staff=True,
     )
-    return assign_role(user, cleaned["role"])
+    user = assign_role(user, cleaned["role"])
+
+    logger.info(
+        "User created",
+        extra={
+            "operation": "create_user",
+            "user_id": str(user.id),
+            "username": user.username,
+            "role": cleaned["role"],
+            "is_active": user.is_active,
+        },
+    )
+
+    return user
 
 
 @transaction.atomic
@@ -225,5 +254,16 @@ def update_user(user: User, payload: dict, partial: bool) -> User:
 
     if cleaned["role"] is not None:
         assign_role(user, cleaned["role"])
-    return user
 
+    logger.info(
+        "User updated",
+        extra={
+            "operation": "update_user",
+            "user_id": str(user.id),
+            "username": user.username,
+            "role": resolve_role(user),
+            "is_active": user.is_active,
+        },
+    )
+
+    return user

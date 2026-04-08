@@ -4,7 +4,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-user-api-local-only")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-user-api-local-only")
 DEBUG = os.getenv("DEBUG", "false").lower() in {"1", "true", "yes"}
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
@@ -21,6 +21,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "iot_logging.django_helpers.RequestContextMiddleware",
+    "app.core.auth.PublicPathJWTAuthMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,12 +81,25 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+INTERNAL_SERVICE_HEADER = os.getenv(
+    "INTERNAL_SERVICE_HEADER",
+    "X-Internal-Service",
+)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "iot_logging.StructuredJsonFormatter",
+        }
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "json",
         }
     },
     "root": {

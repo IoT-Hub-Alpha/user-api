@@ -1,7 +1,10 @@
+import logging
+
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from iot_auth.django import CheckPermissionsMixin
 
 from app.services.user_service import (
     ApiError,
@@ -11,9 +14,13 @@ from app.services.user_service import (
     list_roles,
     paginated_users,
     parse_json_body,
+    resolve_role,
     serialize_user,
     update_user,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def handle_api_error(exc: ApiError) -> JsonResponse:
@@ -21,7 +28,12 @@ def handle_api_error(exc: ApiError) -> JsonResponse:
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class UserListView(View):
+class UserListView(CheckPermissionsMixin, View):
+    permission_map = {
+        "get": ["users.view"],
+        "post": ["users.add"],
+    }
+
     def get(self, request: HttpRequest) -> JsonResponse:
         try:
             page = int(request.GET.get("page", 1))
@@ -45,7 +57,14 @@ class UserListView(View):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class UserDetailView(View):
+class UserDetailView(CheckPermissionsMixin, View):
+    permission_map = {
+        "get": ["users.view"],
+        "put": ["users.change"],
+        "patch": ["users.change"],
+        "delete": ["users.delete"],
+    }
+
     def get(self, request: HttpRequest, user_id: int) -> JsonResponse:
         try:
             user = get_user_or_404(user_id)
@@ -64,7 +83,15 @@ class UserDetailView(View):
             user = get_user_or_404(user_id)
         except ApiError as exc:
             return handle_api_error(exc)
+        user_log_data = {
+            "operation": "delete_user",
+            "user_id": str(user.id),
+            "username": user.username,
+            "role": resolve_role(user),
+            "is_active": user.is_active,
+        }
         user.delete()
+        logger.info("User deleted", extra=user_log_data)
         return HttpResponse(status=204)
 
     def _update(
@@ -79,7 +106,11 @@ class UserDetailView(View):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class UserRoleView(View):
+class UserRoleView(CheckPermissionsMixin, View):
+    permission_map = {
+        "put": ["users.change_role"],
+    }
+
     def put(self, request: HttpRequest, user_id: int) -> JsonResponse:
         try:
             user = get_user_or_404(user_id)
@@ -90,6 +121,8 @@ class UserRoleView(View):
         return JsonResponse({"data": serialize_user(updated)}, status=200)
 
 
-class RoleListView(View):
+class RoleListView(CheckPermissionsMixin, View):
+    required_permissions = ["roles.view"]
+
     def get(self, request: HttpRequest) -> JsonResponse:  # noqa: ARG002
         return JsonResponse({"data": list_roles()}, status=200)

@@ -53,6 +53,9 @@ docker build -t user-api .
 docker run --rm -p 8013:8013 user-api
 ```
 
+`/ready/` returns `503` until the database is reachable and all migrations have
+been applied.
+
 ## Project Structure
 
 ```text
